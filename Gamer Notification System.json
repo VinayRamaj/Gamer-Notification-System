@@ -1,0 +1,513 @@
+{
+  "name": "Gamer Notification System",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🎮 Gamer Notification System\n\nThis workflow automatically fetches gaming news every hour, uses AI to classify and summarize articles, then sends important updates to Telegram.",
+        "height": 200,
+        "width": 400,
+        "color": 5
+      },
+      "id": "7043793a-3974-4f71-a36d-047c90c1e8ca",
+      "name": "Sticky Note 3f913ee1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        112,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Step 1: Schedule**\nRuns every 1 hour using cron expression",
+        "color": 2
+      },
+      "id": "9c46bbdf-a9f8-4c0a-baab-fb3e03abdfbd",
+      "name": "Sticky Note 389e2a8a",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        112,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Step 2: Fetch News**\nGets latest gaming news from Google News RSS feed",
+        "color": 2
+      },
+      "id": "93bcec33-aa71-482b-9694-2c0e946f7f08",
+      "name": "Sticky Note 9c556789",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        112,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Step 3: Process Each Article**\nLoops through each news item individually",
+        "color": 2
+      },
+      "id": "c8480513-d98f-4e59-9bfc-5d0db33bab53",
+      "name": "Sticky Note c003ec13",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        112,
+        752
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Step 4: AI Classification**\nAI reads title, generates summary, and classifies as Update/Event/Ignore",
+        "color": 3
+      },
+      "id": "6a9d696b-257c-46ff-9787-2d1ccb63f52c",
+      "name": "Sticky Note 1bec419e",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        608,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Step 5: Filter**\nOnly continue if category is NOT \"Ignore\"",
+        "color": 3
+      },
+      "id": "a612f500-60b3-4344-8751-88e51f87fcba",
+      "name": "Sticky Note 7f23d363",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        680,
+        776
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Step 6: Send Alert**\nSends formatted notification to Telegram",
+        "color": 4
+      },
+      "id": "60012c95-ffe7-4301-91ae-29d5789d74e9",
+      "name": "Sticky Note 9546c9fa",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "b3f392f2-1fe3-4e58-86ae-4a8281382430",
+      "name": "Every 1 Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        776
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=gaming",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "17af4a8f-facb-458d-8ade-f7af499e408d",
+      "name": "Fetch Gaming News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        528,
+        776
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "items",
+              "value": "={{ $json.items }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      },
+      "id": "d5134c3d-6a49-4eed-8b33-90e943c5d236",
+      "name": "Extract News Items",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        776
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "title",
+              "value": "={{ $json.items[0].title }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "link",
+              "value": "={{ $json.items[0].link }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "pubDate",
+              "value": "={{ $json.items[0].pubDate }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      },
+      "id": "1b0da338-3563-4cba-881c-0c4e5262a6af",
+      "name": "Split to Individual Items",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        976,
+        776
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "status",
+              "value": "All gaming news processed successfully",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      },
+      "id": "6d99f272-cc78-45c9-85a7-245001180cd3",
+      "name": "All Articles Processed",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1488,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this gaming news:\n\nTitle: {{$json[\"title\"]}}\n\nReturn ONLY valid JSON (no extra text):\n\n{\n  \"summary\": \"one line summary\",\n  \"category\": \"Update\"\n}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a gaming news classifier. Analyze news titles and provide structured output with summary and category.",
+          "maxIterations": 3
+        }
+      },
+      "id": "b66999de-d5b3-44cd-9a90-128d32902b80",
+      "name": "AI News Classifier",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1424,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "f9d8c2fc-78dd-4332-af91-c429d555189f",
+      "name": "OpenAI GPT-5 Mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1432,
+        528
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOGgoLtPGcJsPcSD",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.output.category }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              },
+              "rightValue": "Ignore"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "094164dc-3c7c-46ab-9c56-cbc8273f55aa",
+      "name": "Filter Important News",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1776,
+        408
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "message",
+              "value": "=🎮 Gaming Alert!\n\n📰 {{ $json.output.summary }}\n\n📌 Title: {{ $(\"Process Each Article\").item.json.title }}\n\n🔗 Read more: {{ $(\"Process Each Article\").item.json.link }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {
+          "dotNotation": true
+        }
+      },
+      "id": "25b56abb-af3f-46b9-a883-cd16f386596f",
+      "name": "Format Telegram Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2000,
+        408
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "5616024849",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "disable_web_page_preview": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "5f96b4ae-49b5-46bf-a7ba-77ef9df317b4",
+      "name": "Send to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2224,
+        628
+      ],
+      "webhookId": "2aa55d4b-4a7a-4a3d-ac55-09f7ac99dc9b",
+      "credentials": {
+        "telegramApi": {
+          "id": "ajLagwY69Ek3qIcF",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "9efe09b7-7a05-4a5e-b9bd-24082e9a9c10",
+      "name": "Process Each Article",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1200,
+        776
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Every 1 Hour": {
+      "main": [
+        [
+          {
+            "node": "Fetch Gaming News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Gaming News": {
+      "main": [
+        [
+          {
+            "node": "Extract News Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract News Items": {
+      "main": [
+        [
+          {
+            "node": "Split to Individual Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split to Individual Items": {
+      "main": [
+        [
+          {
+            "node": "Process Each Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI News Classifier": {
+      "main": [
+        [
+          {
+            "node": "Filter Important News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI GPT-5 Mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI News Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Important News": {
+      "main": [
+        [
+          {
+            "node": "Format Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Process Each Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "Send to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Telegram": {
+      "main": [
+        [
+          {
+            "node": "Process Each Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Each Article": {
+      "main": [
+        [
+          {
+            "node": "All Articles Processed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI News Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "2d6f0748-bc89-4d2b-ae51-f2661b3430a9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7de87c421a82c19a4141f0dec0589c390589b36550dde41ad0442e9670e24d6b"
+  },
+  "id": "eCR6WzG4w4IyPYJC",
+  "tags": []
+}
