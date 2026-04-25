@@ -16,7 +16,7 @@ Cron → Fetch News → Extract → Split → Process → AI → Filter → Tele
 
 ## 🚀 How to Run
 1. Install n8n locally
-2. Import `workflow.json`
+2. Import `Gamer Notification System.json`
 3. Add credentials:
    - Telegram Bot Token
    - (Optional) OpenAI API Key
